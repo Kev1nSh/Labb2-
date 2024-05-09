@@ -88,7 +88,7 @@ void loop() {
     *PortD |= (0b00000001 << 2);
     delay(50);
   }
-  
+
   *PortB = *PortD;
 
   // Turn off leds with reverse separate patterns.
@@ -109,6 +109,76 @@ void loop() {
 
   // Reset i to avoid overflow.
   if (i == 2222) {
+    i = 0;
+  }
+}
+
+
+*/
+
+/*
+    THIRD ASSIGNMENT!!
+
+    #include <stdint.h>
+    #include <stdio.h>
+
+    volatile uint8_t* DDRN  = (volatile uint8_t*)0x24;
+    volatile uint8_t* PortB = (volatile uint8_t*)0x25;
+    volatile uint8_t* DDRD  = (volatile uint8_t*)0x2A;
+    volatile uint8_t* PortD  = (volatile uint8_t*)0x2B;
+    volatile uint8_t* PinD = (volatile uint8_t*)0x29;
+
+
+
+    void setup() {
+
+  // Set pin 7-4 (PD7-PD4) as an output
+  *DDRD |= (0b00001111 << 2);
+}
+
+    void loop() {
+  uint16_t i = 0;
+
+  i++;
+  // Turn on leds in with separate patterns.
+  if(((*PinD & 0b00100000)!= 0 )&& i & 13 == 0){
+    *PortD |= (0b00000001 << 5);
+    delay(50);
+  }
+  if(((*PinD & 0b00010000)!= 0 ) && i % 29 == 0) {
+    *PortD |= (0b00000001 << 4);
+    delay(50);
+  }
+  if(((*PinD & 0b00001000) !=0) && i % 47 == 0) {
+    *PortD |= (0b00000001 << 3);
+    delay(50);
+  }
+  if (((*PinD & 0b00000100) != 0) && i % 71 == 0) {
+    *PortD |= (0b00000001 << 2);
+    delay(50);
+  }
+  *PortB = *PortD;
+
+  // Turn off leds with reverse separate patterns.
+  if (i % 13 == 0) {
+    *PortD &= 0;
+  }
+  if (i % 29 == 0) {
+    *PortD &= 0;
+  }
+  if (i % 47 == 0) {
+    *PortD &= 0;
+  }
+  if (i % 71 == 0) {
+    *PortD &= 0;
+  }
+  // PORTB gets PORTD.
+  *PortB = *PortD;
+
+  delay(50);
+
+  // Reset i every now and then.
+  if (i == 1000){
     i = 0;
   }
 }
