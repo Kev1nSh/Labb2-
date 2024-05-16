@@ -195,11 +195,11 @@ void loop()
 #define iFREQ 40
 #define DEBOUNCETIME 7
 
-volatile uint8_t* ddrb  = (volatile uint8_t*)0x24;
-volatile uint8_t* portb = (volatile uint8_t*)0x25;
-volatile uint8_t* ddrd  = (volatile uint8_t*)0x2A;
-volatile uint8_t* portd = (volatile uint8_t*)0x2B;
-volatile uint8_t* pind  = (volatile uint8_t*)0x29;
+volatile uint8_t* DDRB  = (volatile uint8_t*)0x24;
+volatile uint8_t* PortB = (volatile uint8_t*)0x25;
+volatile uint8_t* DDRD  = (volatile uint8_t*)0x2A;
+volatile uint8_t* PortD = (volatile uint8_t*)0x2B;
+volatile uint8_t* PinD  = (volatile uint8_t*)0x29;
 
 uint32_t iPreviousTime;
 uint32_t lastGLedTime;
@@ -213,7 +213,7 @@ uint8_t prePreviousState = 0b00000000;
 uint8_t buttonState = 0;
 
 uint8_t debounce() {
-  uint8_t debounceCheck = *pind;
+  uint8_t debounceCheck = *PinD;
   currentTime = millis();
   if (currentTime - lastDebounceTime >= DEBOUNCETIME) {
     if (previousState != debounceCheck) {
@@ -227,7 +227,7 @@ uint8_t debounce() {
 
 // Listens for an change in input.
 bool changeListener() {
-  uint8_t currentRead = *pind;
+  uint8_t currentRead = *PinD;
   if (currentRead != previousState) {
     return true;
   }
@@ -268,7 +268,7 @@ uint8_t buttonListener() {
 
 void setup() {
   // Set pin 10-13 (PB1-PB5) as outputs.
-  *ddrb |= (0b00111110);
+  *DDRB |= (0b00111110);
   iPreviousTime = lastGLedTime = lastDebounceTime = millis();
 }
 
@@ -294,15 +294,15 @@ void loop() {
 
   if (tenClicksFlag) {
     if (currentTime - lastGLedTime < THREESEC) {
-      *portd |= (0b00000010);
+      *PortD |= (0b00000010);
     } else {
-      *portd &= ~(0b00000010);
+      *PortD &= ~(0b00000010);
       tenClicksFlag = false;
     }
   } else if (buttonState == 2) {
-    *portd |= (0b00000010);
+    *PortD |= (0b00000010);
   } else {
-    *portd &= ~(0b00000010);
+    *PortD &= ~(0b00000010);
   }
 
   // Logic to count clicks and trigger the ten clicks behavior.
@@ -310,51 +310,51 @@ void loop() {
     clickCount = 0; 
     tenClicksFlag = true; 
     lastGLedTime = currentTime; 
-    *portd |= (0b00000010);
+    *PortD |= (0b00000010);
   }
 
   // PORTB gets PORTD.
-  *portb = *portd;
+  *PortB = *PortD;
 
   // Turn LEDs on with separate patterns when corresponding button is held down.
   // Pin 10
-  if (((*pind & 0b00000100) != 0) && i %  37 == 0) {
-    *portd |= (0b00000100);
+  if (((*PinD & 0b00000100) != 0) && i %  37 == 0) {
+    *PortD |= (0b00000100);
   }
   // Pin 11
-  if (((*pind & 0b00001000) != 0) && i % 41 == 0) {
-    *portd |= (0b00001000);
+  if (((*PinD & 0b00001000) != 0) && i % 41 == 0) {
+    *PortD |= (0b00001000);
   }
   // Pin 12
-  if (((*pind & 0b00010000) != 0) && i % 43 == 0) {
-    *portd |= (0b00010000);
+  if (((*PinD & 0b00010000) != 0) && i % 43 == 0) {
+    *PortD |= (0b00010000);
   }
   // Pin 13
-  if (((*pind & 0b00100000) != 0) && i % 47 == 0) {
-    *portd |= (0b00100000);
+  if (((*PinD & 0b00100000) != 0) && i % 47 == 0) {
+    *PortD |= (0b00100000);
   }
 
-  *portb = *portd;
+  *PortB = *PortD;
 
   // Turn LEDs off with reverse separate patterns.
   // Pin 10
   if (i % 37 == 0) {
-    *portd &= ~(0b00000100);  
+    *PortD &= ~(0b00000100);  
   }
   // Pin 11
   if (i % 41 == 0) {
-    *portd &= ~(0b00001000);
+    *PortD &= ~(0b00001000);
   }
   // Pin 12
   if (i % 43 == 0) {
-    *portd &= ~(0b00010000);
+    *PortD &= ~(0b00010000);
   }
   // Pin 13
   if (i % 47 == 0) {
-    *portd &= ~(0b00100000);  
+    *PortD &= ~(0b00100000);  
   }
 
-  *portb = *portd;
+  *PortB = *PortD;
 
   // Reset i every now and then.
   if (i == 1027) {
